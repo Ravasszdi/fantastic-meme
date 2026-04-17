@@ -13,27 +13,40 @@ import java.util.Random;
  */
 public class Jatek {
     private int korokSzama;
-    Csiga[] csigak = new Csiga[3];
+    Csiga[] csigak;
     private final static Random RNG = new Random();
 
+    public Jatek(int korokSzama, Csiga[] csigak) {
+        this.korokSzama = korokSzama<0?1:korokSzama;
+        this.csigak = csigak;
+    }
+
+    public Jatek(int korokSzama, Szinek szinek[]) {
+        this(korokSzama,csigaGyar(szinek));
+    }
+
     public Jatek(int korokSzama) {
-        int i = 0;
-        this.korokSzama = korokSzama;
-        this.csigak[i++] = new Csiga(Szinek.PIROS);
-        this.csigak[i++] = new Csiga(Szinek.ZOLD);
-        this.csigak[i++] = new Csiga(Szinek.KEK);
+        this(korokSzama,csigaGyar());
+    }
+    
+    public Jatek() {
+        this(3, csigaGyar());
     }
     
     public String start(Szinek szavazas){
+        csigakFutas();
+        int nyi = gyoztesKereses();
+        return "Te a " + szavazas + " színű csigára fogadtál!\n" + 
+                this.CsigakMegjelenitese() +
+               "A " + csigak[nyi].getSzin() + "-ű nyert!\n" +
+               "Te " + (csigak[nyi].getSzin()==szavazas?"Nyertél!":"Vesztettél!):")+"\n";
+    }
+    
+    private void csigakFutas() {
         for(int i = 0; i < korokSzama; i++){
             gyorsasagSorsolas();
             csigaFut();
         }
-        int nyi = gyoztesKereses();
-        return "Te a " + szavazas + " színű csigára fogadtál!\n" + 
-                this.CsigakToString() +
-               "A " + csigak[nyi].getSzin() + "-ű nyert!\n" +
-               "Te " + (csigak[nyi].getSzin()==szavazas?"Nyertél!":"Vesztettél!):")+"\n";
     }
     
     private void gyorsasagSorsolas(){
@@ -51,20 +64,36 @@ public class Jatek {
     private int gyoztesKereses(){
         int nyi = 0;
         for(int i = 1; i < csigak.length; i++){
-            if(csigak[nyi].getTav() < csigak[i].getTav()){
+            if(csigak[nyi].getUt().length() < csigak[i].getUt().length()){
                 nyi = i;
             }
         }
         return nyi;
     }
 
-    private String CsigakToString() {
-        int i = 0;
-        return csigak[i++].toString() + "\n" +
-               csigak[i++].toString() + "\n" +
-               csigak[i++].toString() + "\n";
+    private String CsigakMegjelenitese() {
+        String ki = "";
+        for (int i = 0; i < csigak.length; i++) {
+            ki += csigak[i].kijelzes() + "\n";
+        }
+        return ki;
     }
     
+    private static Csiga[] csigaGyar(Szinek[] szinek){
+        Csiga[] csigakTmp = new Csiga[szinek.length];
+        for (int i = 0; i < szinek.length; i++) {
+            csigakTmp[i] = new Csiga(szinek[i]);
+        }
+        return csigakTmp;
+    }
     
+    private static Csiga[] csigaGyar(){
+        Szinek[] szinek = {Szinek.KEK, Szinek.PIROS, Szinek.ZOLD};
+        Csiga[] csigakTmp = new Csiga[szinek.length];
+        for (int i = 0; i < szinek.length; i++) {
+            csigakTmp[i] = new Csiga(szinek[i]);
+        }
+        return csigakTmp;
+    }
     
 }
